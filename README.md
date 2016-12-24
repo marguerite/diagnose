@@ -46,6 +46,29 @@ In the previous case, `libavformat57` is oss while all others are from packman. 
 from a different repository" disabled which is default and switch packages one by one by yourself, you
 are exposed to such cases.
 
-Tell him to doownload and run `pkmswitch100 --all`, problem solved.
+Tell him to doownload and run `pkmswitch100`, problem solved.
+
+NOTE: always run "sudo zypper ref" first.
+
+there're 3 options: "-ffmpeg", "-vlc", "-gstreamer". by default all of the three will be checked.
+
+	======================= Packages not from Packman =========================
+	libavformat57
+
+	FIX: Run 'sudo zypper install libavformat57-3.2.2-3.4.x86_64'.
+	======================= Packman Packages need updates =====================
+	libavutil55
+	ffmpeg
+	libavfilter6
+	libpostproc54
+	libavcodec57
+	libswresample2
+	libswscale4
+	vlc-lang
+	gstreamer-plugins-ugly-orig-addon
+	libavdevice57
+	libavresample3
+
+	FIX: Run 'sudo zypper up libavutil55 ffmpeg libavfilter6 libpostproc54 libavcodec57 libswresample2 libswscale4 vlc-lang gstreamer-plugins-ugly-orig-addon libavdevice57 libavresample3'.
 
 
