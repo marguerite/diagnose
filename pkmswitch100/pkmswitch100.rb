@@ -80,7 +80,7 @@ workers = pool_size.times.map do
 			while x = jobs.pop(true)
 				stdin = `LANG=en_US.UTF-8 zypper --no-refresh se -v #{x}`
 				stdin.each_line do |line|
-					if (line.index("v\s|") || line.index("i\s|")) && ! line.index("| application")
+					if (line.index("v\s|") || line.index("i\s|")) && line.index(x + "\s")
 						# v | libavformat57   | package | 3.2.2-3.4 | i586   | packman
 						arr = line.split("|").each {|i| i.strip!}
 						unless pkgs.has_key?(arr[1])
