@@ -3,7 +3,7 @@
 This project aims to collect the diagnose tools I wrote to help openSUSE freshmen to report issues on forum.
 All written in ruby and can be natively ran on openSUSE.
 
-it includes:
+It includes:
 
 #### `instdpkg` AKA "installed packages" ####
 
@@ -13,7 +13,7 @@ Case:
 
 A user posted on forum saying "I don't know what happened, I just installed some packages then problem occurs."
 
-Tell him to download and run `instdpkg.rb -d=date -t=time`. it will tell you what "some packages" are.
+Tell him to download and run `instdpkg.rb -d=date -t=time`. It will tell you what "some packages" are.
 
 	================ Packages altered on 2016-12-22 after 23:26:12 ======================
 	|  date   |  time  | oper. | name | version | repo |
@@ -48,9 +48,10 @@ are exposed to such cases.
 
 Tell him to doownload and run `pkmswitch100`, problem solved.
 
-NOTE: always run "sudo zypper ref" first.
+NOTE: Always run "sudo zypper ref" first. And this is not a installation tool but a debug tool, 
+it will not install the packages that you haven't installed.
 
-there're 3 options: "-ffmpeg", "-vlc", "-gstreamer". by default all of the three will be checked.
+There're 3 options: "-ffmpeg", "-vlc", "-gstreamer". by default all of the three will be checked.
 
 	======================= Packages not from Packman =========================
 	libavformat57
@@ -71,4 +72,25 @@ there're 3 options: "-ffmpeg", "-vlc", "-gstreamer". by default all of the three
 
 	FIX: Run 'sudo zypper up libavutil55 ffmpeg libavfilter6 libpostproc54 libavcodec57 libswresample2 libswscale4 vlc-lang gstreamer-plugins-ugly-orig-addon libavdevice57 libavresample3'.
 
+#### `bstmirror` AKA "Best Mirror"
 
+As it says, it will find the best mirror of openSUSE/Packman for you.
+
+The usage is quite easy, `ruby bstmirror.rb -region="North America" -os=422 -file=quick` will get this:
+
+	======================= Best openSUSE Mirror ======================
+	http://mirrors.tuna.tsinghua.edu.cn/opensuse/
+	======================= Best Packman Mirror =======================
+	http://mirror.karneval.cz/pub/linux/packman/
+
+You can omit "-region" option if you want to check worldwide.
+
+If you omit "-os" it will check 42.2 mirrors by default
+
+You can also omit "-file=quick" because by default it's quick, or use "-file=long" option which will download a larger file for more accurate speed test.
+
+NOTE: Mirror lists are obtained from mirrors.opensuse.org and packman.link2linux.de/mirrors. If you want to use some underground mirror, I will not know.
+And for some unknown reasons, some mirrors listed on mirrors.opensuse.org do has eg. 42.2 repos which are identified by MirrorBrain as none. For now, I
+just take what it provides.
+
+Future Plan: Add a config file so you can add your underground mirrors. Use a spider to visit the repo that are identified to have 0 repo, for more accurate result.
