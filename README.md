@@ -71,26 +71,3 @@ There're 3 options: "-ffmpeg", "-vlc", "-gstreamer". by default all of the three
 	libavresample3
 
 	FIX: Run 'sudo zypper up libavutil55 ffmpeg libavfilter6 libpostproc54 libavcodec57 libswresample2 libswscale4 vlc-lang gstreamer-plugins-ugly-orig-addon libavdevice57 libavresample3'.
-
-#### `bstmirror` AKA "Best Mirror"
-
-As it says, it will find the best mirror of openSUSE/Packman for you.
-
-The usage is quite easy, `ruby bstmirror.rb -region="North America" -os=422 -file=quick` will get this:
-
-	======================= Best openSUSE Mirror ======================
-	http://mirrors.tuna.tsinghua.edu.cn/opensuse/
-	======================= Best Packman Mirror =======================
-	http://mirror.karneval.cz/pub/linux/packman/
-
-You can omit "-region" option if you want to check worldwide.
-
-If you omit "-os" it will check 42.2 mirrors by default
-
-You can also omit "-file=quick" because by default it's quick, or use "-file=long" option which will download a larger file for more accurate speed test.
-
-NOTE: Mirror lists are obtained from mirrors.opensuse.org and packman.link2linux.de/mirrors. If you want to use some underground mirror, I will not know.
-And for some unknown reasons, some mirrors listed on mirrors.opensuse.org do has eg. 42.2 repos which are identified by MirrorBrain as none. For now, I
-just take what it provides.
-
-Future Plan: Add a config file so you can add your underground mirrors. Use a spider to visit the repo that are identified to have 0 repo, for more accurate result.
