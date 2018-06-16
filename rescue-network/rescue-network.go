@@ -144,10 +144,9 @@ func removeRoute(dev string) {
 	if len(routes) > 0 {
 		for _, r := range routes {
 			if re.MatchString(r) {
-				cmd := "route del " + r
-				out, err = exec.Command("/sbin/ip", strings.Split(cmd, " ")[0:]...).Output()
-				fmt.Println(out)
-				fmt.Println(err)
+				// remove linkdown
+				cmd := "route del " + strings.Replace(r, " linkdown ", "", -1)
+				_, err = exec.Command("/sbin/ip", strings.Split(cmd, " ")[0:]...).Output()
 				errChk(err)
 			}
 		}
@@ -182,7 +181,7 @@ func setDNS() {
 	errChk(err)
 	defer f.Close()
 
-	re := regexp.MustCompile(`"(?m)^nameserver.*?$`)
+	re := regexp.MustCompile(`(?m)^nameserver.*?$`)
 	if !re.MatchString(string(out)) {
 		f.WriteString("nameserver 8.8.8.8\n")
 		f.WriteString("nameserver 8.8.4.4\n")
