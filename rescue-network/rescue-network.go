@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -143,7 +144,8 @@ func removeRoute(dev string) {
 	if len(routes) > 0 {
 		for _, r := range routes {
 			if re.MatchString(r) {
-				out, err = exec.Command("/sbin/ip", "route", "del", r).Output()
+				cmd := "route del " + r
+				out, err = exec.Command("/sbin/ip", strings.Split(cmd, " ")[0:]...).Output()
 				fmt.Println(out)
 				fmt.Println(err)
 				errChk(err)
@@ -152,8 +154,40 @@ func removeRoute(dev string) {
 	}
 }
 
-func setRoute(ip, netmask, dev string) {
+func countNetMask(nm string) string {
+	re := regexp.MustCompile("255")
+	num := len(re.FindAllStringSubmatch(nm, -1))
+	return strconv.Itoa(num * 8)
+}
+
+func findIPRange(gw string) string {
+	re := regexp.MustCompile(`(\d+\.\d+\.\d+\.).*`)
+	return re.FindStringSubmatch(gw)[1] + "0"
+}
+
+func setRoute(ip, gateway, netmask, dev string) {
 	removeRoute(dev)
+	nm := countNetMask(netmask)
+	ran := findIPRange(gateway)
+	_, err := exec.Command("/sbin/ip", "route", "add", ran+"/"+nm, "dev", dev, "proto", "kernel", "scope", "link", "src", ip, "metric", "600").Output()
+	errChk(err)
+	_, err = exec.Command("/sbin/ip", "route", "add", "default", "via", gateway, "dev", dev, "proto", "dhcp", "metric", "600").Output()
+	errChk(err)
+}
+
+func setDNS() {
+	out, err := ioutil.ReadFile("/etc/resolv.conf")
+	errChk(err)
+	f, err := os.OpenFile("/etc/resolv.conf", os.O_APPEND|os.O_WRONLY, 0644)
+	errChk(err)
+	defer f.Close()
+
+	re := regexp.MustCompile(`"(?m)^nameserver.*?$`)
+	if !re.MatchString(string(out)) {
+		f.WriteString("nameserver 8.8.8.8\n")
+		f.WriteString("nameserver 8.8.4.4\n")
+		f.Sync()
+	}
 }
 
 func main() {
@@ -164,8 +198,8 @@ func main() {
 	var passwd string
 
 	flag.StringVar(&dt, "device", "wifi", "device type: wifi or wired")
-	flag.StringVar(&gw, "gateway", "192.168.1.0", "gateway")
-	flag.StringVar(&nm, "netmask", "255.255.255.0", "netmask")
+	flag.StringVar(&gw, "gateway", "", "gateway")
+	flag.StringVar(&nm, "netmask", "", "netmask")
 	flag.StringVar(&essid, "essid", "", "Your Wi-Fi's name")
 	flag.StringVar(&passwd, "password", "", "Your Wi-Fi's password")
 
@@ -192,14 +226,18 @@ ESSID with '--essid='.`)
 	wired, wifi := getDeviceNames()
 	fmt.Println("ethernet:" + wired)
 	fmt.Println("wireless:" + wifi)
+	dev := wired
 
 	if dt == "wifi" {
+		dev = wifi
 		killWpaSupplicant()
 		conf := createWpaSupplicantConfig(essid, passwd)
 		fmt.Println("new wpa_supplicant configuration created at:" + conf)
-		runWpaSupplicantConfig(wifi, conf)
-		ip := setIPAddr(gw, nm, wifi)
-		fmt.Println(ip)
-		setRoute(ip, nm, wifi)
+		runWpaSupplicantConfig(dev, conf)
 	}
+	ip := setIPAddr(gw, nm, wifi)
+	fmt.Println(ip)
+	setRoute(ip, gw, nm, wifi)
+	setDNS()
+	fmt.Println("successfully rescued network.")
 }
