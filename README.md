@@ -98,3 +98,10 @@ Available options:
     -essid your WIFI's name.
     -password your WIFI's password
 
+## rpm-unowned
+
+Check for file not owned by rpm:
+
+    rpm-unowned -dir /usr/lib64
+
+Everything printed are not owned by rpm.
