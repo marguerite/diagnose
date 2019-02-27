@@ -1,7 +1,6 @@
-## Diagnose tools for openSUSE ##
+## Diagnostic tools for openSUSE ##
 
-This project aims to collect the diagnose tools I wrote to help openSUSE freshmen to report issues on forum.
-All written in ruby and can be natively ran on openSUSE.
+This project aims to collect the diagnostic tools I wrote to help openSUSE freshmen to report issues on forum.
 
 It includes:
 
@@ -105,3 +104,15 @@ Check for file not owned by rpm:
     rpm-unowned -dir /usr/lib64
 
 Everything printed are not owned by rpm.
+
+## consistent-repo
+
+Check for packages not installed from a specific repository
+
+    consistent-repo -p <pkg> -r <repo>
+
+The `pkg` is a string that can be separated by ",", specifying the package or package list to be passed to `zypper se`.
+`consistent-repo` will search the terms via zypper and check every package returned against the repo.
+
+The `repo` is your `local alias` of an openSUSE repo. eg, the upstream name maybe "openSUSE-Leap-15.0-Oss", but your local
+alias is just "oss", use "oss". You can get alias via "zypper lr".
