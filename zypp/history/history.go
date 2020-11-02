@@ -1,4 +1,4 @@
-package main
+package history
 
 import (
 	"bufio"
@@ -18,7 +18,6 @@ type LogItem struct {
 	Value    string
 	Version  string
 	Arch     string
-	Comment  string
 	Hostname string
 	Repo     string
 	Hash     string
