@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -30,6 +31,43 @@ type Repository struct {
 	Path         string
 	Priority     int
 	KeepPackages bool
+}
+
+// Marshal write the .repo file, you should run with enough permissions
+func (r Repository) Marshal() {
+	str := "[" + r.Name + "]\n"
+	str += "name=" + r.Nick + "\n"
+	var enabled, autorefresh, keeppackages string
+	if r.Enabled {
+		enabled = "1"
+	} else {
+		enabled = "0"
+	}
+	if r.AutoRefresh {
+		autorefresh = "1"
+	} else {
+		autorefresh = "0"
+	}
+	if r.KeepPackages {
+		keeppackages = "1"
+	} else {
+		keeppackages = "0"
+	}
+	str += "enabled=" + enabled + "\n"
+	str += "autorefresh=" + autorefresh + "\n"
+	str += "baseurl=" + r.BaseURL + "\n"
+	str += "type=" + r.Type + "\n"
+	if len(r.Path) > 0 {
+		str += "path=" + r.Path + "\n"
+	}
+	if r.Priority > 0 {
+		str += "priority=" + strconv.Itoa(r.Priority) + "\n"
+	}
+	str += "keeppackages=" + keeppackages + "\n"
+	err := ioutil.WriteFile(r.File, []byte(str), 0644)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // Unmarshal initialize a repository
