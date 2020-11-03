@@ -15,20 +15,24 @@ const (
 	PATH = "/etc/zypp/repos.d"
 )
 
+// Repositories .repo files
 type Repositories []Repository
 
+// Repository represents a .repo file in /etc/zypp/repos.d/
 type Repository struct {
 	File         string
 	Name         string
+	Nick         string
 	Enabled      bool
 	AutoRefresh  bool
-	BaseUrl      string
+	BaseURL      string
 	Type         string
 	Path         string
 	Priority     int
 	KeepPackages bool
 }
 
+// Unmarshal initialize a repository
 func (r *Repository) Unmarshal(rd io.Reader) {
 	scanner := bufio.NewScanner(rd)
 	for scanner.Scan() {
@@ -61,11 +65,11 @@ func (r *Repository) Unmarshal(rd io.Reader) {
 				r.KeepPackages = true
 			}
 		case "baseurl":
-			r.BaseUrl = arr[1]
+			r.BaseURL = arr[1]
 		case "type":
 			r.Type = arr[1]
 		case "name":
-			r.Name = arr[1]
+			r.Nick = arr[1]
 		case "path":
 			r.Path = arr[1]
 		case "priority":
@@ -77,7 +81,8 @@ func (r *Repository) Unmarshal(rd io.Reader) {
 	}
 }
 
-func New() (repos Repositories) {
+// NewRepositories initialize system repositories
+func NewRepositories() (repos Repositories) {
 	f, err := os.Open(PATH)
 	defer f.Close()
 	if err != nil {

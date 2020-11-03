@@ -1,39 +1,38 @@
-## Diagnostic tools for openSUSE ##
+## Diagnosis tools for openSUSE ##
 
-This project aims to collect the diagnostic tools I wrote to help openSUSE freshmen to report issues on forum.
+This project aims to collect the diagnosis tools I wrote to help openSUSE freshmen to report issues on forum.
 
 It includes:
 
 #### `instdpkg` AKA "installed packages" ####
 
-Tell the user what packages he/she installed/removed on the specific `date`, since the `time`.
+Tell the user what packages were installed/removed on the specific `date`, since the `time`.
 
-Case: 
+Case:
 
 A user posted on forum saying "I don't know what happened, I just installed some packages then problem occurs."
 
-Tell him to download and run `instdpkg -date=2016-06-01 -time=00:00:00`. It will tell you what "some packages" are.
+Tell him to download and run `sudo instdpkg -date=2020-10-20`. It will tell you what "some packages" are.
 
-	================ Packages altered on 2016-12-22 after 23:26:12 ======================
-	|       time        | action | name | version | arch | repo |
-	2016-12-22 23:39:36|install|libavformat57|3.2.2-3.3 x86_64|packman
-	2016-12-22 23:26:12|install|libgstbasecamerabinsrc-1_0-0|1.10.2-4.7|x86_64|packman
-	2016-12-22 23:26:12|install|libgstphotography-1_0-0|1.10.2-4.7|x86_64|packman
-	2016-12-22 23:26:12|install|gstreamer-plugins-ugly|1.10.2-4.2|x86_64|packman
-	2016-12-22 23:26:13|install|libgstbadvideo-1_0-0|1.10.2-4.7|x86_64|packman
-	2016-12-22 23:26:13|install|libgstbadaudio-1_0-0|1.10.2-4.7|x86_64|packman
-	2016-12-22 23:26:13|install|libgstadaptivedemux-1_0-0|1.10.2-4.7|x86_64|packman
-	2016-12-22 23:26:14|install|gstreamer-plugins-bad|1.10.2-4.7|x86_64|packman
+    ====== Packages modified after 2020-10-20 00:00:00 ======
+    time               |action |name            |version     |arch  |repo
+    2020-10-20 10:06:43|install|libspiro1       |20200505-1.1|x86_64|repo-oss
+    2020-10-20 10:06:44|install|libuninameslist1|20200413-1.2|x86_64|repo-oss
+    2020-10-20 10:06:44|install|libwoff2enc1_0_2|1.0.2-3.10  |x86_64|repo-oss
+    2020-10-20 10:06:49|install|fontforge       |20200314-3.3|x86_64|repo-oss
 
-Even forgot the date? "just two weeks ago"? Run `instdpkg -timeline` and find out the date.
+Even forgot the date? "just two weeks ago"? Run `sudo instdpkg -timeline` and find out the date.
 
-	2016-06-01
-	2016-11-17
-	2016-12-23
+    2020-10-01 12:34:41 +0000 UTC
+    2020-10-02 11:26:26 +0000 UTC
+    2020-10-05 14:34:38 +0000 UTC
+    2020-10-15 11:48:06 +0000 UTC
+    2020-10-20 10:06:41 +0000 UTC
+    2020-11-03 11:31:21 +0000 UTC
 
 #### `pkmswitch100` AKA "packman switch 100%?"
 
-Tell the user if he/she has related packages (ffmpeg, vlc and etc) 100% switched from oss's to packman's.
+Tell the user if related packages (ffmpeg, vlc and gstreamer) were 100% switched from oss to packman.
 
 Case:
 
@@ -45,31 +44,19 @@ In the previous case, `libavformat57` is oss while all others are from packman. 
 from a different repository" disabled which is default and switch packages one by one by yourself, you
 are exposed to such cases.
 
-Tell him to doownload and run `pkmswitch100`, problem solved.
+Tell him to download and run `pkmswitch100`, problem solved.
 
-NOTE: Always run "sudo zypper ref" first. And this is not a installation tool but a debug tool, 
+NOTE: Always run "sudo zypper ref" first. And this is not a installation tool but a debug tool,
 it will not install the packages that you haven't installed.
 
-There're 3 options: "-ffmpeg", "-vlc", "-gstreamer". by default all of the three will be checked.
+There're 3 options: `-type=ffmpeg`, `-type=vlc`, `-type=gstreamer`. by default all of the three will be checked.
 
-	======================= Packages not from Packman =========================
-	libavformat57
-
-	FIX: Run 'sudo zypper install libavformat57-3.2.2-3.4.x86_64'.
-	======================= Packman Packages need updates =====================
-	libavutil55
-	ffmpeg
-	libavfilter6
-	libpostproc54
-	libavcodec57
-	libswresample2
-	libswscale4
-	vlc-lang
-	gstreamer-plugins-ugly-orig-addon
-	libavdevice57
-	libavresample3
-
-	FIX: Run 'sudo zypper up libavutil55 ffmpeg libavfilter6 libpostproc54 libavcodec57 libswresample2 libswscale4 vlc-lang gstreamer-plugins-ugly-orig-addon libavdevice57 libavresample3'.
+    ====== Packages not installed ======
+    gstreamer-plugins-bad-chromaprint libgstplayer-1_0-0 gstreamer-plugins-bad-fluidsynth libgstcodecs-1_0-0 libgstvulkan-1_0-0 libgstinsertbin-1_0-0 gstreamer-transcoder vlc-codecs libgsttranscoder-1_0-0
+    FIX: sudo zypper in gstreamer-plugins-bad-chromaprint libgstplayer-1_0-0 gstreamer-plugins-bad-fluidsynth libgstcodecs-1_0-0 libgstvulkan-1_0-0 libgstinsertbin-1_0-0 gstreamer-transcoder vlc-codecs libgsttranscoder-1_0-0 --from packman
+    ====== Packages should be updated ASAP ======
+    libgstwebrtc-1_0-0 libswscale5 libgstisoff-1_0-0 gstreamer-plugins-ugly gstreamer-plugins-bad-orig-addon libgstbasecamerabinsrc-1_0-0 libavutil56 libavfilter7 libgsturidownloader-1_0-0 gstreamer-plugins-bad libswresample3 libgstcodecparsers-1_0-0 libgstadaptivedemux-1_0-0 libgstbadaudio-1_0-0 libgstsctp-1_0-0 gstreamer-plugins-libav libgstmpegts-1_0-0 libavdevice58 libpostproc55 libavresample4 gstreamer-plugins-ugly-orig-addon libgstwayland-1_0-0 libgstphotography-1_0-0 libavformat58 libavcodec58
+    FIX: sudo zypper up libgstwebrtc-1_0-0 libswscale5 libgstisoff-1_0-0 gstreamer-plugins-ugly gstreamer-plugins-bad-orig-addon libgstbasecamerabinsrc-1_0-0 libavutil56 libavfilter7 libgsturidownloader-1_0-0 gstreamer-plugins-bad libswresample3 libgstcodecparsers-1_0-0 libgstadaptivedemux-1_0-0 libgstbadaudio-1_0-0 libgstsctp-1_0-0 gstreamer-plugins-libav libgstmpegts-1_0-0 libavdevice58 libpostproc55 libavresample4 gstreamer-plugins-ugly-orig-addon libgstwayland-1_0-0 libgstphotography-1_0-0 libavformat58 libavcodec58
 
 #### rescue-network
 

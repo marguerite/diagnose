@@ -3,11 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/marguerite/diagnose/zypp/history"
 	"os"
 	"os/user"
 	"text/tabwriter"
 	"time"
+
+	"github.com/marguerite/diagnose/zypp/history"
 )
 
 func main() {
@@ -43,7 +44,7 @@ func main() {
 		}
 		sorted := h.NetInstalled().FindByTime(date)
 
-		w := tabwriter.NewWriter(os.Stdout, 0, 4, 0, '\t', 0)
+		w := tabwriter.NewWriter(os.Stdout, 0, 8, 0, ' ', tabwriter.Debug)
 		fmt.Println("====== Packages modified after " + d + " " + t + " ======")
 		fmt.Fprintln(w, "time\taction\tname\tversion\tarch\trepo")
 		for _, j := range sorted {

@@ -5,14 +5,54 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 
+	"github.com/marguerite/go-stdlib/exec"
 	"github.com/marguerite/go-stdlib/slice"
 )
 
 // Searchables search results
 type Searchables []Searchable
+
+// Installed list the installed packages only
+func (s Searchables) Installed() (s1 Searchables) {
+	for _, v := range s {
+		if v.Installed {
+			s1 = append(s1, v)
+		}
+	}
+	return s1
+}
+
+// Available list the available but not installed packages only
+func (s Searchables) Available() (s1 Searchables) {
+	for _, v := range s {
+		if v.Available {
+			s1 = append(s1, v)
+		}
+	}
+	return s1
+}
+
+// FilterByArch filter the results by architecture
+func (s Searchables) FilterByArch(arch string) (s1 Searchables) {
+	for _, v := range s {
+		if v.Arch == arch {
+			s1 = append(s1, v)
+		}
+	}
+	return s1
+}
+
+// FilterByRepository filter the results by repository
+func (s Searchables) FilterByRepository(repo string) (s1 Searchables) {
+	for _, v := range s {
+		if v.Repository == repo {
+			s1 = append(s1, v)
+		}
+	}
+	return s1
+}
 
 // Searchable search result
 type Searchable struct {
@@ -39,17 +79,20 @@ func NewSearch(str string, installedOnly bool, options ...string) (searchables S
 	slice.Concat(&cmd, options)
 	cmd = append(cmd, str)
 
-	command := exec.Command("/usr/bin/zypper", cmd...)
-	command.Env = append(os.Environ(), "LANG=en_US.UTF-8")
-	out, err := command.Output()
+	env := append(os.Environ(), "LANG=en_US.UTF-8")
+	out, stat, err := exec.Exec3WithEnv("/usr/bin/zypper", env, cmd...)
 	if err != nil {
-		panic(err)
+		// exit code 104 indicates no package found, should not treat as error
+		if stat != 104 {
+			panic(err)
+		} else {
+			fmt.Printf("package %s not found\n", cmd[len(cmd)-1])
+		}
 	}
 	scanner := bufio.NewScanner(bytes.NewReader(out))
 	for scanner.Scan() {
 		if strings.HasPrefix(scanner.Text(), "v") || strings.HasPrefix(scanner.Text(), "i") {
 			arr := strings.Split(scanner.Text(), "|")
-			fmt.Println(arr)
 			for i, v := range arr {
 				arr[i] = strings.TrimSpace(v)
 			}
