@@ -214,7 +214,7 @@ func main() {
 				panic(err)
 			}
 
-			for i := 0; i <= collection.NumFonts(); i++ {
+			for i := 0; i < collection.NumFonts(); i++ {
 				ot, err := collection.Font(i)
 				if err != nil {
 					//panic(err)
