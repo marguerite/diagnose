@@ -4,10 +4,11 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"os"
+	"io"
+	"os/exec"
 	"strings"
 
-	"github.com/marguerite/go-stdlib/exec"
+	"github.com/marguerite/go-stdlib/open3"
 	"github.com/marguerite/go-stdlib/slice"
 )
 
@@ -68,28 +69,34 @@ type Searchable struct {
 
 // NewSearch initialize a new zypper search
 func NewSearch(str string, installedOnly bool, options ...string) (searchables Searchables) {
-	cmd := []string{"--no-refresh", "se"}
+	opts := []string{"--no-refresh", "se"}
 	var suffix string
 	if installedOnly {
 		suffix = "-i"
 	} else {
 		suffix = "-v"
 	}
-	cmd = append(cmd, suffix)
-	slice.Concat(&cmd, options)
-	cmd = append(cmd, str)
+	opts = append(opts, suffix)
+	slice.Concat(&opts, options)
+	opts = append(opts, str)
 
-	env := append(os.Environ(), "LANG=en_US.UTF-8")
-	out, stat, err := exec.Exec3WithEnv("/usr/bin/zypper", env, cmd...)
+	cmd := exec.Command("/usr/bin/zypper", opts...)
+	stdoutbuf := bytes.NewBuffer([]byte{})
+	wt, err := open3.Popen3(cmd, "", func(stdin io.WriteCloser, stdout, stderr io.ReadCloser, wt open3.Wait_thr) error {
+		stdin.Close()
+		stdoutbuf.ReadFrom(stdout)
+		return nil
+	}, "LANG=en_US.UTF-8")
+
 	if err != nil {
 		// exit code 104 indicates no package found, should not treat as error
-		if stat != 104 {
+		if wt.Value != 104 {
 			panic(err)
 		} else {
-			fmt.Printf("package %s not found\n", cmd[len(cmd)-1])
+			fmt.Printf("package %s not found\n", str)
 		}
 	}
-	scanner := bufio.NewScanner(bytes.NewReader(out))
+	scanner := bufio.NewScanner(stdoutbuf)
 	for scanner.Scan() {
 		if strings.HasPrefix(scanner.Text(), "v") || strings.HasPrefix(scanner.Text(), "i") {
 			arr := strings.Split(scanner.Text(), "|")

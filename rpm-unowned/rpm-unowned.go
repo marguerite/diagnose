@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/marguerite/util/dir"
+	"github.com/marguerite/go-stdlib/dir"
 	"os"
 	"os/exec"
 )
@@ -25,7 +25,8 @@ func printUnOwned(path string) {
 
 	var files []string
 	if f.IsDir() {
-		files = dir.Lsf(path)
+		var err error
+		files, err = dir.Ls(path, false, false, "dir")
 	} else {
 		files = append(files, path)
 	}
