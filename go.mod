@@ -11,6 +11,5 @@ require (
 	github.com/openSUSE-zh/node-semver v0.0.0-20200214151914-1018a6bff0ca
 	github.com/zachomedia/go-bdf v0.0.0-20200707041239-4d208bb116e0
 	golang.org/x/image v0.0.0-20200927104501-e162460cd6b5
-	golang.org/x/net v0.0.0-20201031054903-ff519b6c9102 // indirect
-	golang.org/x/text v0.3.4 // indirect
+	golang.org/x/text v0.3.8 // indirect
 )
